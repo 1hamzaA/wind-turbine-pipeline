@@ -1,0 +1,25 @@
+[project]
+name = "wind-turbine-pipeline"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Hamza",email = "hamza.akhtar16@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "pyspark (>=4.2.0,<5.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "wind_turbine_pipeline", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pylint (>=4.0.7,<5.0.0)",
+    "pytest (>=9.1.1,<10.0.0)"
+]
