@@ -1,15 +1,15 @@
 [project]
 name = "wind-turbine-pipeline"
 version = "0.1.0"
-description = ""
+description = "PySpark pipeline for processing wind turbine data"
 authors = [
-    {name = "Hamza",email = "hamza.akhtar16@gmail.com"}
+    {name = "Hamza Akhtar"}
 ]
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 dependencies = [
     "pyspark (>=4.2.0,<5.0.0)",
-    "pandas (<3.0)"
+    "pandas (>=2.2.0,<3.0.0)"
 ]
 
 [tool.poetry]

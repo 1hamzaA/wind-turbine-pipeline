@@ -70,18 +70,21 @@ def test_calculate_summary_statistics(spark):
     first_window = {
         row["turbine_id"]: row
         for row in rows
-        if row["window"]["start"]
-        == datetime(2022, 3, 1)
+        if row["window_start"] == datetime(2022, 3, 1)
     }
 
+    assert first_window[1]["window_end"] == datetime(2022, 3, 2)
+    assert first_window[1]["period_hours"] == 24
     assert first_window[1]["min_power_output"] == 2.0
     assert first_window[1]["max_power_output"] == 6.0
     assert first_window[1]["avg_power_output"] == 4.0
 
+    assert first_window[2]["window_end"] == datetime(2022, 3, 2)
+    assert first_window[2]["period_hours"] == 24
     assert first_window[2]["min_power_output"] == 1.0
     assert first_window[2]["max_power_output"] == 5.0
     assert first_window[2]["avg_power_output"] == 3.0
-
+    
 
 def test_identify_anomalies(spark):
     df = spark.createDataFrame(
