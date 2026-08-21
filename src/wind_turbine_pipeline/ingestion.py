@@ -18,13 +18,15 @@ turbine_data_schema = StructType(
     ]
 )
 
-def read_turbine_data(spark: SparkSession, input_path: str) -> DataFrame:
+def read_turbine_data(spark: SparkSession, input_paths: list[str]) -> DataFrame:
     """
     Read raw turbine CSV data into a Spark DataFrame.
 
     Args:
         spark (SparkSession): Spark session object.
-        input_path (str): Path to the input CSV file.
+        input_paths (list[str]): List of paths to the input CSV files.
+    Returns:
+            DataFrame: DataFrame containing raw turbine data with the specified schema.
     """
 
-    return spark.read.option("header", True).schema(turbine_data_schema).csv(input_path) 
+    return spark.read.option("header", True).schema(turbine_data_schema).csv(input_paths) 

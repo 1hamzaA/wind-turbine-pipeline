@@ -1,23 +1,35 @@
 # Wind Turbine Data Pipeline
 
-A PySpark pipeline for processing wind turbine power generation data.
+A proof-of-concept PySpark pipeline for processing and analysing wind turbine power generation data.
+
+The pipeline ingests multiple CSV files, cleans the data, calculates time-windowed statistics, identifies anomalies, and writes the processed results to CSV.
 
 ## Project Structure
 
 ```text
 wind-turbine-pipeline/
 ├── data/
-│   └── raw/
-│       ├── data_group_1.csv
-│       ├── data_group_2.csv
-│       └── data_group_3.csv
+│   ├── raw/
+│   │   ├── data_group_1.csv
+│   │   ├── data_group_2.csv
+│   │   └── data_group_3.csv
+│   └── processed/
+│       ├── cleaned_turbine_data.csv
+│       ├── summary_statistics.csv
+│       └── anomalies.csv
 ├── src/
 │   └── wind_turbine_pipeline/
-│       ├── __init__.py
-│       └── ingestion.py
+│       ├── ingestion.py
+│       ├── cleaning.py
+│       ├── analysis.py
+│       ├── storage.py
+│       └── orchestrator.py
 ├── tests/
 │   ├── conftest.py
-│   └── test_ingestion.py
+│   ├── test_ingestion.py
+│   ├── test_cleaning.py
+│   └── test_analysis.py
+├── run_pipeline.py
 ├── pyproject.toml
 ├── poetry.lock
 ├── .gitignore
@@ -29,12 +41,9 @@ wind-turbine-pipeline/
 - Python 3.11
 - Java 17
 - Poetry
-
-PySpark requires Java to run.
+- PySpark
 
 ## Setup
-
-Clone the repository and install the dependencies:
 
 ```powershell
 git clone <repository-url>
@@ -42,44 +51,106 @@ cd wind-turbine-pipeline
 python -m poetry install
 ```
 
-## Running Tests
+## Running the Pipeline
 
-Run the test suite with:
+```powershell
+python -m poetry run python run_pipeline.py
+```
+
+The pipeline currently processes:
+
+```text
+data/raw/data_group_1.csv
+data/raw/data_group_2.csv
+data/raw/data_group_3.csv
+```
+
+The default analysis period is 24 hours and can be changed using the `period_hours`
+parameter.
+
+## Running Tests
 
 ```powershell
 python -m poetry run pytest
 ```
 
-## Current Implementation
-
-### Ingestion
-
-The ingestion module reads the raw CSV files into a PySpark DataFrame using an explicit schema.
-
-The input data contains:
-
-- `timestamp`
-- `turbine_id`
-- `wind_speed`
-- `wind_direction`
-- `power_output`
-
-The ingestion functionality is covered by pytest tests using a small test dataset.
+The tests cover ingestion, cleaning, summary statistics, and anomaly detection.
 
 ## Pipeline
 
-The planned pipeline is:
-
 ```text
-Raw CSV
-   ↓
-Ingestion
-   ↓
-Cleaning
-   ↓
-Analysis
-   ↓
-Output
+Raw CSV Files
+      ↓
+   Ingestion
+      ↓
+    Cleaning
+      ↓
+    Analysis
+      ↓
+    Storage
 ```
 
-The remaining stages will be added incrementally.
+### Ingestion
+
+Multiple CSV files are loaded into Spark using an explicit schema.
+
+### Cleaning
+
+Raw turbine data is validated and cleaned before analysis.
+
+### Analysis
+
+#### Summary Statistics
+
+For each turbine and fixed time window, the pipeline calculates:
+
+- Minimum power output
+- Maximum power output
+- Average power output
+
+The window duration is configurable, with a default of 24 hours.
+
+The output contains:
+
+- `window_start`
+- `window_end`
+- `turbine_id`
+- `min_power_output`
+- `max_power_output`
+- `avg_power_output`
+
+#### Anomaly Detection
+
+Power output is compared against the mean and standard deviation for the same
+turbine and time window.
+
+A measurement is considered anomalous when it falls outside:
+
+```text
+mean ± 2 × standard deviation
+```
+
+The result contains an `is_anomaly` flag.
+
+## Output
+
+The pipeline produces:
+
+```text
+data/processed/
+├── cleaned_turbine_data.csv
+├── summary_statistics.csv
+└── anomalies.csv
+```
+
+Outputs are sorted for readability and deterministic results:
+
+- Cleaned data: timestamp → turbine ID → source file
+- Anomalies: timestamp → turbine ID → source file
+- Summary statistics: window start → turbine ID
+
+## Storage Approach
+
+CSV is used for this proof of concept because it is simple and easy to inspect.
+
+The local Windows environment required additional Hadoop/`winutils.exe` configuration for Spark's native file writer. Given the small dataset and the limited scope of this technical exercise, Pandas is used to write the final DataFrames to CSV.
