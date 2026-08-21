@@ -51,6 +51,21 @@ cd wind-turbine-pipeline
 python -m poetry install
 ```
 
+## Dependencies
+
+Runtime dependencies include PySpark and pandas.
+
+Development dependencies are managed separately and include:
+
+- pytest for testing
+- pylint for code quality checks
+
+Install all dependencies, including development dependencies, with:
+
+```powershell
+python -m poetry install
+```
+
 ## Running the Pipeline
 
 ```powershell
