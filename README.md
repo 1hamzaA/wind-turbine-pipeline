@@ -143,12 +143,6 @@ data/processed/
 └── anomalies.csv
 ```
 
-Outputs are sorted for readability and deterministic results:
-
-- Cleaned data: timestamp → turbine ID → source file
-- Anomalies: timestamp → turbine ID → source file
-- Summary statistics: window start → turbine ID
-
 ## Storage Approach
 
 CSV is used for this proof of concept because it is simple and easy to inspect.
